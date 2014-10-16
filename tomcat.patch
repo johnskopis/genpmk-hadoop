@@ -1,0 +1,57 @@
+--- tomcat-native-1.1.31-src/jni/native/build-outputs.mk	2014-07-02 13:45:19.000000000 -0700
++++ tomcat-native-1.1.31-src.hash/jni/native/build-outputs.mk	2014-09-08 00:12:32.022124810 -0700
+@@ -5,6 +5,7 @@
+ src/dir.lo: src/dir.c .make.dirs include/tcn.h include/tcn_api.h
+ src/error.lo: src/error.c .make.dirs include/tcn.h include/tcn_api.h
+ src/file.lo: src/file.c .make.dirs include/tcn.h include/tcn_api.h
++src/hash.lo: src/hash.c .make.dirs include/tcn.h include/tcn_api.h
+ src/info.lo: src/info.c .make.dirs include/tcn.h include/tcn_api.h
+ src/jnilib.lo: src/jnilib.c .make.dirs include/tcn.h include/tcn_api.h include/tcn_version.h
+ src/lock.lo: src/lock.c .make.dirs include/tcn.h include/tcn_api.h
+@@ -26,7 +27,7 @@
+ src/thread.lo: src/thread.c .make.dirs include/tcn.h include/tcn_api.h
+ src/user.lo: src/user.c .make.dirs include/tcn.h include/tcn_api.h
+ 
+-OBJECTS_all = src/address.lo src/bb.lo src/dir.lo src/error.lo src/file.lo src/info.lo src/jnilib.lo src/lock.lo src/misc.lo src/mmap.lo src/multicast.lo src/network.lo src/os.lo src/poll.lo src/pool.lo src/proc.lo src/shm.lo src/ssl.lo src/sslcontext.lo src/sslinfo.lo src/sslnetwork.lo src/sslutils.lo src/stdlib.lo src/thread.lo src/user.lo
++OBJECTS_all = src/address.lo src/bb.lo src/dir.lo src/error.lo src/file.lo src/hash.lo src/info.lo src/jnilib.lo src/lock.lo src/misc.lo src/mmap.lo src/multicast.lo src/network.lo src/os.lo src/poll.lo src/pool.lo src/proc.lo src/shm.lo src/ssl.lo src/sslcontext.lo src/sslinfo.lo src/sslnetwork.lo src/sslutils.lo src/stdlib.lo src/thread.lo src/user.lo
+ 
+ os/unix/system.lo: os/unix/system.c .make.dirs include/tcn.h include/tcn_api.h
+ os/unix/uxpipe.lo: os/unix/uxpipe.c .make.dirs include/tcn.h include/tcn_api.h
+--- /dev/null	2014-10-07 15:19:38.726238906 -0700
++++ tomcat-native-1.1.31-src.hash/jni/native/src/hash.c	2014-10-12 23:13:53.509089524 -0700
+@@ -0,0 +1,27 @@
++#include "tcn.h"
++#include <string.h>
++#include <openssl/evp.h>
++#include <openssl/sha.h>
++#define BUFF_SIZE 32
++
++TCN_IMPLEMENT_CALL(jbyteArray, Hash, pbkdf2HmacSha1)(TCN_STDARGS,
++	jstring pass,
++	jstring salt) {
++
++  char hash[BUFF_SIZE];
++
++	TCN_ALLOC_CSTRING(pass);
++	TCN_ALLOC_CSTRING(salt);
++
++	PKCS5_PBKDF2_HMAC_SHA1(cpass, strlen(cpass), csalt, strlen(csalt), (int32_t)4096, BUFF_SIZE, hash);
++
++	TCN_FREE_CSTRING(pass);
++	TCN_FREE_CSTRING(salt);
++
++  jbyteArray ret = (*e)->NewByteArray(e, BUFF_SIZE);
++
++  (*e)->SetByteArrayRegion(e, ret, 0, BUFF_SIZE, (jbyte*)hash);
++
++  return ret;
++}
++
+--- /dev/null	2014-10-07 15:19:38.726238906 -0700
++++ tomcat-native-1.1.31-src.hash/jni/java/org/apache/tomcat/jni/Hash.java	2014-10-12 23:03:02.113597882 -0700
+@@ -0,0 +1,5 @@
++package org.apache.tomcat.jni;
++
++public final class Hash {
++  public static native byte[] pbkdf2HmacSha1(String pass, String salt) throws Error;
++}
