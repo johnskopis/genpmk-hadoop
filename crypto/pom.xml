@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.skopis.john</groupId>
+    <artifactId>top</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  <groupId>com.skopis.john</groupId>
+  <artifactId>crypto</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>crypto</name>
+  <url>http://maven.apache.org</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+
+<!-- https://maven.apache.org/plugins/maven-install-plugin/examples/specific-local-repo.html -->
+<!--  mvn install:install-file -Dfile=lib/tomcat-native-1.1.31-dev.jar \
+      -DgroupId=org.apache.tomcat -DartifactId=jni -Dpackaging=jar -Dversion=1.1.31-dev-SNAPSHOT
+      -->
+  <dependency>
+    <groupId>org.apache.tomcat</groupId>
+    <artifactId>jni</artifactId>
+    <version>1.1.31-dev-SNAPSHOT</version>
+  </dependency>
+</dependencies>
+
+<build>
+  <plugins>
+    <plugin>
+      <artifactId>maven-assembly-plugin</artifactId>
+      <executions>
+        <execution>
+          <id>bundle-project-sources</id>
+          <phase>package</phase>
+          <goals>
+            <goal>single</goal>
+          </goals>
+          <configuration>
+            <descriptorRefs>
+              <descriptorRef>
+                jar-with-dependencies
+              </descriptorRef>
+            </descriptorRefs>
+            <archive>
+              <manifest>
+                <mainClass>com.skopis.john.crypto.App</mainClass>
+              </manifest>
+            </archive>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+</project>
+
